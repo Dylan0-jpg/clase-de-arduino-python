@@ -1,0 +1,2064 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso Interactivo: Python + Arduino para Automatización</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-main: #080c14;
+            --bg-nav: #060a11;
+            --bg-card: #0f1829;
+            --bg-card2: #111827;
+            --border: #1e2d45;
+            --border-bright: #2a3f5f;
+            --text-main: #eef2ff;
+            --text-muted: #7d92b0;
+            --text-dim: #4a607a;
+            --accent-orange: #f97316;
+            --accent-orange-glow: rgba(249,115,22,0.2);
+            --accent-blue: #3b82f6;
+            --accent-blue-glow: rgba(59,130,246,0.15);
+            --accent-cyan: #06b6d4;
+            --accent-purple: #a855f7;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --accent-red: #ef4444;
+            --code-bg: #050912;
+            --cpp-color: #60a5fa;
+            --py-color: #fbbf24;
+            --cpp-bg: rgba(96,165,250,0.08);
+            --py-bg: rgba(251,191,36,0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ── BACKGROUND GRID ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── NAV ── */
+        nav {
+            width: 290px;
+            min-width: 290px;
+            background-color: var(--bg-nav);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 14px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        nav::-webkit-scrollbar { width: 4px; }
+        nav::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 4px; }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 10px 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 14px;
+        }
+
+        .nav-logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent-orange), #dc2626);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 0 20px rgba(249,115,22,0.4);
+        }
+
+        .nav-logo-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .nav-logo-text span { color: var(--text-muted); font-weight: 400; font-size: 12px; display: block; }
+
+        /* Progress Bar */
+        .progress-container {
+            margin: 0 4px 16px;
+        }
+        .progress-label {
+            font-size: 11px; color: var(--text-muted);
+            display: flex; justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        .progress-bar {
+            height: 4px; background: var(--border);
+            border-radius: 4px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-orange));
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+
+        .phase-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-dim);
+            margin: 18px 0 6px 8px;
+            font-weight: 700;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            text-align: left;
+            padding: 9px 10px;
+            font-size: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            width: 100%;
+            position: relative;
+        }
+
+        .nav-btn:hover {
+            background-color: rgba(255,255,255,0.04);
+            color: var(--text-main);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, rgba(249,115,22,0.2), rgba(249,115,22,0.05));
+            color: white;
+            font-weight: 600;
+            border: 1px solid rgba(249,115,22,0.3);
+        }
+
+        .nav-btn.active i { color: var(--accent-orange); }
+
+        .nav-btn .badge-new {
+            margin-left: auto;
+            font-size: 9px;
+            background: var(--accent-purple);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        /* ── MAIN ── */
+        main {
+            flex: 1;
+            padding: 36px 52px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        main::-webkit-scrollbar { width: 6px; }
+        main::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 4px; }
+
+        .slide-content {
+            display: none;
+            animation: slideIn 0.35s cubic-bezier(0.16,1,0.3,1) forwards;
+        }
+
+        .slide-content.active { display: block; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── TYPOGRAPHY ── */
+        h1.main-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 34px;
+            font-weight: 900;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, var(--text-main) 50%, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* ── CARDS ── */
+        .concept-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+
+        .concept-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-blue), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .concept-card:hover { border-color: var(--border-bright); }
+        .concept-card:hover::before { opacity: 1; }
+
+        .concept-card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .concept-card h3 .tag {
+            font-size: 11px;
+            background-color: var(--accent-blue-glow);
+            color: #60a5fa;
+            border: 1px solid rgba(59,130,246,0.3);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .concept-card p {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 14px;
+        }
+
+        .concept-card ul {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-left: 20px;
+            margin-bottom: 14px;
+        }
+
+        .concept-card li { margin-bottom: 8px; }
+        .concept-card li strong { color: var(--text-main); }
+
+        /* ── CODE BLOCKS ── */
+        .code-wrapper {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .code-header {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .code-header .lang-badge {
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .lang-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+        }
+        .lang-dot.python { background: var(--py-color); }
+        .lang-dot.cpp { background: var(--cpp-color); }
+        .lang-dot.arduino { background: var(--accent-green); }
+
+        .copy-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 0 0 10px 10px;
+            padding: 16px 20px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        pre.standalone {
+            border-radius: 10px;
+            border-left: 3px solid var(--accent-orange);
+        }
+
+        code .keyword { color: #ff79c6; font-weight: bold; }
+        code .string { color: #f1fa8c; }
+        code .number { color: #bd93f9; }
+        code .comment { color: #4d5d7a; font-style: italic; }
+        code .function { color: #50fa7b; }
+        code .type { color: #8be9fd; }
+        code .operator { color: #ff79c6; }
+
+        /* ── DIAGRAMS ── */
+        .diagram-container {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            margin: 18px 0;
+        }
+
+        .diagram-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .diagram-flex {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 8px 0;
+        }
+
+        .diagram-box {
+            background: #0f1829;
+            border: 1.5px solid var(--accent-blue);
+            border-radius: 8px;
+            padding: 10px 16px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+            min-width: 120px;
+        }
+
+        .diagram-box.orange { border-color: var(--accent-orange); }
+        .diagram-box.green { border-color: var(--accent-green); }
+        .diagram-box.yellow { border-color: var(--accent-yellow); }
+        .diagram-box.purple { border-color: var(--accent-purple); }
+
+        .diagram-arrow { color: var(--text-dim); font-size: 16px; }
+
+        .pin-map {
+            display: grid;
+            gap: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            background: #050912;
+            padding: 14px;
+            border-radius: 8px;
+        }
+
+        .pin-line {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            border-bottom: 1px solid #0f1829;
+            padding: 5px 0;
+        }
+
+        .pin-line span:first-child { color: var(--accent-blue); font-weight: bold; }
+        .pin-line span:last-child { color: #94a3b8; }
+
+        /* ── TASK BADGE ── */
+        .badge-task {
+            background: linear-gradient(135deg, rgba(249,115,22,0.12), rgba(249,115,22,0.04));
+            border: 1px solid rgba(249,115,22,0.25);
+            color: #fb923c;
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        /* ── INFO CHIPS ── */
+        .info-chips {
+            display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0;
+        }
+
+        .chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 12px; font-weight: 600;
+            border: 1px solid;
+        }
+
+        .chip.blue { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); color: #60a5fa; }
+        .chip.green { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3); color: #34d399; }
+        .chip.orange { background: rgba(249,115,22,0.1); border-color: rgba(249,115,22,0.3); color: #fb923c; }
+        .chip.purple { background: rgba(168,85,247,0.1); border-color: rgba(168,85,247,0.3); color: #c084fc; }
+        .chip.yellow { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3); color: #fbbf24; }
+
+        /* ── COMPARISON TABLE (C++ vs Python) ── */
+        .compare-hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .lang-header {
+            border-radius: 14px;
+            padding: 18px 22px;
+            display: flex; align-items: center; gap: 14px;
+        }
+
+        .lang-header.cpp-h {
+            background: var(--cpp-bg);
+            border: 2px solid rgba(96,165,250,0.35);
+        }
+
+        .lang-header.py-h {
+            background: var(--py-bg);
+            border: 2px solid rgba(251,191,36,0.35);
+        }
+
+        .lang-icon {
+            font-size: 28px; font-weight: 900;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .lang-icon.cpp { color: var(--cpp-color); }
+        .lang-icon.py { color: var(--py-color); }
+
+        .lang-meta strong { font-family: 'Outfit', sans-serif; font-size: 18px; display: block; }
+        .lang-meta span { font-size: 12px; color: var(--text-muted); }
+
+        /* Comparison cards grid */
+        .compare-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .compare-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: border-color 0.3s, transform 0.2s;
+            cursor: pointer;
+        }
+
+        .compare-card:hover {
+            border-color: var(--border-bright);
+            transform: translateY(-2px);
+        }
+
+        .compare-card-header {
+            padding: 14px 20px;
+            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .compare-symbol {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            min-width: 50px;
+            text-align: center;
+            background: rgba(6,182,212,0.1);
+            border: 1px solid rgba(6,182,212,0.3);
+            padding: 6px 10px;
+            border-radius: 8px;
+        }
+
+        .compare-card-header h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+        }
+
+        .compare-card-header p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .compare-cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .compare-col {
+            padding: 16px 20px;
+        }
+
+        .compare-col.cpp-col {
+            border-right: 1px solid var(--border);
+            border-top: 2px solid rgba(96,165,250,0.3);
+        }
+
+        .compare-col.py-col {
+            border-top: 2px solid rgba(251,191,36,0.3);
+        }
+
+        .col-lang-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+
+        .col-lang-label.cpp { color: var(--cpp-color); }
+        .col-lang-label.py { color: var(--py-color); }
+
+        .compare-col pre {
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .compare-col .desc {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+
+        .diff-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        .diff-badge.strict { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+        .diff-badge.flexible { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+        .diff-badge.note { background: rgba(168,85,247,0.15); color: #c084fc; border: 1px solid rgba(168,85,247,0.3); }
+
+        /* ── INTERACTIVE TABS ── */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--code-bg);
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 14px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border-bright);
+        }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ── HOVER REVEAL ── */
+        .reveal-card {
+            background: var(--bg-card2);
+            border: 1px dashed var(--border-bright);
+            border-radius: 12px;
+            padding: 16px 20px;
+            cursor: pointer;
+            margin: 10px 0;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .reveal-card:hover {
+            background: var(--bg-card);
+            border-style: solid;
+            border-color: var(--accent-blue);
+        }
+
+        .reveal-card .reveal-hint {
+            font-size: 12px;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reveal-card .reveal-content {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .reveal-card.open .reveal-content { display: block; }
+        .reveal-card.open .reveal-hint { color: var(--accent-blue); }
+
+        /* ── STAT BOXES ── */
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .stat-box {
+            background: var(--bg-card2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-box .stat-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .stat-box .stat-lbl {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* ── INTRO HERO ── */
+        .intro-hero {
+            background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(249,115,22,0.05));
+            border: 1px solid rgba(59,130,246,0.2);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .intro-hero::after {
+            content: '⚡';
+            position: absolute;
+            right: 30px; top: 20px;
+            font-size: 80px;
+            opacity: 0.06;
+        }
+
+        .intro-hero h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .intro-hero p {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.7;
+            max-width: 680px;
+        }
+
+        /* Phase cards */
+        .phase-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .phase-card {
+            background: var(--bg-card2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .phase-card:hover { border-color: var(--border-bright); transform: translateY(-3px); }
+
+        .phase-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+        }
+
+        .phase-card h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .phase-card p {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .phase-icon {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        /* Memory grid animation */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4px;
+            margin: 14px 0;
+            padding: 14px;
+            background: var(--code-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .mem-cell {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            background: #0f1829;
+            border: 1px solid #1a2540;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            color: var(--text-dim);
+            transition: all 0.3s;
+            cursor: default;
+        }
+
+        .mem-cell.active-int { background: rgba(59,130,246,0.3); border-color: var(--accent-blue); color: var(--accent-blue); }
+        .mem-cell.active-float { background: rgba(249,115,22,0.3); border-color: var(--accent-orange); color: var(--accent-orange); }
+        .mem-cell.active-char { background: rgba(16,185,129,0.3); border-color: var(--accent-green); color: var(--accent-green); }
+
+        /* Toggle switch */
+        .toggle-row {
+            display: flex; align-items: center; gap: 12px; margin: 14px 0;
+            background: var(--bg-card2); border-radius: 10px; padding: 12px 16px;
+            border: 1px solid var(--border);
+        }
+
+        .toggle-switch {
+            position: relative; width: 44px; height: 22px;
+        }
+
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+        .toggle-slider {
+            position: absolute; cursor: pointer;
+            inset: 0; background: var(--border);
+            border-radius: 22px; transition: 0.3s;
+        }
+
+        .toggle-slider::before {
+            content: ''; position: absolute;
+            height: 16px; width: 16px;
+            left: 3px; bottom: 3px;
+            background: white; border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-switch input:checked + .toggle-slider { background: var(--accent-blue); }
+        .toggle-switch input:checked + .toggle-slider::before { transform: translateX(22px); }
+
+        .toggle-label { font-size: 13px; color: var(--text-muted); }
+        .toggle-label strong { color: var(--text-main); }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-logo">
+            <div class="nav-logo-icon">⚙️</div>
+            <div class="nav-logo-text">
+                Control & Sistemas
+                <span>Python + Arduino</span>
+            </div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-label">
+                <span>Progreso del curso</span>
+                <span id="progressPct">0%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+
+        <div class="phase-title">Introducción General</div>
+        <button class="nav-btn active" onclick="showDay('intro')"><i class="fa-solid fa-book-open"></i> Fundamentos del Curso</button>
+        <button class="nav-btn" onclick="showDay('comparativa')"><i class="fa-solid fa-code-compare"></i> C++ vs Python </button>
+
+        <div class="phase-title">Fase 1 · Fundamentos Python</div>
+        <button class="nav-btn" onclick="showDay('dia1')"><i class="fa-solid fa-box"></i> Día 1: Variables y Constantes</button>
+        <button class="nav-btn" onclick="showDay('dia2')"><i class="fa-solid fa-calculator"></i> Día 2: Enteros y Flotantes</button>
+        <button class="nav-btn" onclick="showDay('dia3')"><i class="fa-solid fa-code-fork"></i> Día 3: Estructuras Condicionales</button>
+        <button class="nav-btn" onclick="showDay('dia4')"><i class="fa-solid fa-rotate"></i> Día 4: Estructuras Cíclicas</button>
+
+        <div class="phase-title">Fase 2 · Electrónica Embebida</div>
+        <button class="nav-btn" onclick="showDay('dia5')"><i class="fa-solid fa-bolt"></i> Día 5: Protoboard y Salida Digital</button>
+        <button class="nav-btn" onclick="showDay('dia6')"><i class="fa-solid fa-traffic-light"></i> Día 6: Secuencias Multicanal</button>
+        <button class="nav-btn" onclick="showDay('dia7')"><i class="fa-solid fa-fingerprint"></i> Día 7: Lectura Digital y Flotación</button>
+        <button class="nav-btn" onclick="showDay('dia8')"><i class="fa-solid fa-volume-high"></i> Día 8: Frecuencias Acústicas</button>
+
+        <div class="phase-title">Fase 3 · Integración de Sistemas</div>
+        <button class="nav-btn" onclick="showDay('dia9')"><i class="fa-solid fa-eye"></i> Día 9: Telemetría por Ultrasonido</button>
+        <button class="nav-btn" onclick="showDay('dia10')"><i class="fa-solid fa-arrow-right-arrows-left"></i> Día 10: Enlace Serial USB</button>
+        <button class="nav-btn" onclick="showDay('dia11')"><i class="fa-solid fa-gamepad"></i> Día 11: Interfaz de Comandos</button>
+        <button class="nav-btn" onclick="showDay('dia12')"><i class="fa-solid fa-shield-halved"></i> Día 12: Sistema Integrado Final</button>
+    </nav>
+
+    <main>
+
+        <!-- ═══════════════════ INTRO ═══════════════════ -->
+        <div id="intro" class="slide-content active">
+            <h1 class="main-title">Programa de integración de Arduino/Python</h1>
+            <p class="subtitle">Marco de referencia para el desarrollo de proyectos embebidos y procesamiento local de señales.</p>
+
+            <div class="intro-hero">
+                <h2>🎯 Objetivo General del Curso</h2>
+                <p>Este plan de estudios técnico está diseñado para cappacitar en el diseño, conexionado y despliegue de <strong>arquitecturas de automatización locales</strong>. Se estudia la unificación del software de alto nivel (Python) con hardware perimetral de procesamiento en tiempo real (C++ en Microcontroladores), resolviendo problemas de adquisición de datos, acondicionamiento de señales y control remoto bidireccional.</p>
+                <div class="info-chips" style="margin-top:16px;">
+                    <span class="chip blue"><i class="fa-brands fa-python"></i> Python 3.x</span>
+                    <span class="chip green"><i class="fa-solid fa-microchip"></i> Arduino C++</span>
+                    <span class="chip orange"><i class="fa-solid fa-link"></i> Serial USB</span>
+                    <span class="chip purple"><i class="fa-solid fa-robot"></i> Automatización</span>
+                </div>
+            </div>
+
+            <div class="phase-cards">
+                <div class="phase-card">
+                    <div class="phase-icon">🐍</div>
+                    <div class="phase-num">FASE 1 / DÍAS 1-4</div>
+                    <h4>Fundamentos de Software</h4>
+                    <p>Variables, tipos de datos, estructuras condicionales e iteraciones en Python con tipado dinámico.</p>
+                </div>
+                <div class="phase-card">
+                    <div class="phase-icon">⚡</div>
+                    <div class="phase-num">FASE 2 / DÍAS 5-8</div>
+                    <h4>Electrónica Embebida</h4>
+                    <p>Registros GPIO, ley de Ohm, protoboard, entradas/salidas digitales y modulación de señales.</p>
+                </div>
+                <div class="phase-card">
+                    <div class="phase-icon">🔗</div>
+                    <div class="phase-num">FASE 3 / DÍAS 9-12</div>
+                    <h4>Integración Full-Duplex</h4>
+                    <p>Comunicación serial, telemetría por ultrasonido y sistema automatizado completo.</p>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <h3>Arquitectura Completa del Sistema <span class="tag">Visión Global</span></h3>
+                <div class="diagram-container">
+                    <div class="diagram-title"><i class="fa-solid fa-layer-group"></i> Flujo de Integración de Capas</div>
+                    <div class="diagram-flex">
+                        <div class="diagram-box">🌡️ Sensores<br><small>Capa Física</small></div>
+                        <div class="diagram-arrow">➔</div>
+                        <div class="diagram-box green">⚙️ Arduino C++<br><small>Microcontrolador</small></div>
+                        <div class="diagram-arrow">➔ USB Serial ➔</div>
+                        <div class="diagram-box orange">🐍 Python<br><small>Procesador Central</small></div>
+                        <div class="diagram-arrow">➔</div>
+                        <div class="diagram-box purple">📊 Actuadores<br><small>Respuesta</small></div>
+                    </div>
+                </div>
+                <p>Cada capa tiene una responsabilidad única: los sensores capturan el mundo real, el microcontrolador lo digitaliza y transmite, Python lo procesa e interpreta, y finalmente los actuadores generan una respuesta física medible.</p>
+            </div>
+        </div>
+
+        <!-- ═══════════════════ COMPARATIVA C++ vs PYTHON ═══════════════════ -->
+        <div id="comparativa" class="slide-content">
+            <h1 class="main-title">C++ vs Python: Comparativa de Sintaxis</h1>
+            <p class="subtitle">Análisis lado a lado de los elementos clave que distinguen el lenguaje del microcontrolador del lenguaje de alto nivel. Haz clic en cada tarjeta para explorar los detalles.</p>
+
+            <div class="compare-hero">
+                <div class="lang-header cpp-h">
+                    <div class="lang-icon cpp">C++</div>
+                    <div class="lang-meta">
+                        <strong>C++ / Arduino</strong>
+                        <span>Tipado estático · Compilado · Bajo nivel</span>
+                    </div>
+                </div>
+                <div class="lang-header py-h">
+                    <div class="lang-icon py">Py</div>
+                    <div class="lang-meta">
+                        <strong>Python 3</strong>
+                        <span>Tipado dinámico · Interpretado · Alto nivel</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="compare-grid">
+
+                <!-- int -->
+                <div class="compare-card" onclick="this.classList.toggle('open')">
+                    <div class="compare-card-header">
+                        <span class="compare-symbol">int</span>
+                        <div>
+                            <h4>Tipo Entero — Número sin decimales</h4>
+                            <p>Almacena valores numéricos enteros (positivos o negativos) sin parte fraccionaria</p>
+                        </div>
+                    </div>
+                    <div class="compare-cols">
+                        <div class="compare-col cpp-col">
+                            <div class="col-lang-label cpp">C++ / Arduino</div>
+                            <pre><code><span class="type">int</span> temperatura = <span class="number">25</span>;
+<span class="type">int</span> contador = <span class="number">0</span>;
+contador++; <span class="comment">// incremento</span></code></pre>
+                            <div class="desc">
+                                <strong style="color:var(--cpp-color)">Tamaño fijo:</strong> ocupa exactamente <strong>4 bytes (32 bits)</strong> en memoria. Rango: de −2,147,483,648 a +2,147,483,647. La declaración del tipo <code>int</code> es <em>obligatoria</em> antes del nombre de la variable.
+                                <div class="diff-badge strict">⚠ Tipado Estático — No puede cambiar</div>
+                            </div>
+                        </div>
+                        <div class="compare-col py-col">
+                            <div class="col-lang-label py">Python 3</div>
+                            <pre><code>temperatura = <span class="number">25</span>
+contador = <span class="number">0</span>
+contador += <span class="number">1</span>  <span class="comment"># incremento</span></code></pre>
+                            <div class="desc">
+                                <strong style="color:var(--py-color)">Precisión arbitraria:</strong> Python no limita el tamaño del entero. Puede representar números astronómicamente grandes sin desbordamiento. El tipo se deduce automáticamente del valor asignado.
+                                <div class="diff-badge flexible">✓ Tipado Dinámico — Se adapta solo</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- char -->
+                <div class="compare-card" onclick="this.classList.toggle('open')">
+                    <div class="compare-card-header">
+                        <span class="compare-symbol">char</span>
+                        <div>
+                            <h4>Tipo Carácter — Un símbolo individual</h4>
+                            <p>Representa un único carácter de texto basado en la tabla ASCII</p>
+                        </div>
+                    </div>
+                    <div class="compare-cols">
+                        <div class="compare-col cpp-col">
+                            <div class="col-lang-label cpp">C++ / Arduino</div>
+                            <pre><code><span class="type">char</span> letra = <span class="string">'A'</span>;   <span class="comment">// comillas simples</span>
+<span class="type">char</span> comando = <span class="string">'E'</span>; <span class="comment">// carácter de control</span>
+<span class="function">Serial</span>.write(letra); <span class="comment">// envía byte</span></code></pre>
+                            <div class="desc">
+                                <strong style="color:var(--cpp-color)">1 byte exacto.</strong> En C++ <code>char</code> guarda un único carácter con comillas simples. Internamente es un número entero de 8 bits que corresponde al código ASCII. 'A' = 65, 'E' = 69. Se utiliza ampliamente para enviar comandos por el puerto serial.
+                                <div class="diff-badge strict">⚠ Solo 1 carácter — comillas simples</div>
+                            </div>
+                        </div>
+                        <div class="compare-col py-col">
+                            <div class="col-lang-label py">Python 3</div>
+                            <pre><code>letra = <span class="string">"A"</span>     <span class="comment"># str de 1 char</span>
+comando = <span class="string">"E"</span>   <span class="comment"># sin tipo char</span>
+arduino.write(comando.encode()) <span class="comment"># → bytes</span></code></pre>
+                            <div class="desc">
+                                <strong style="color:var(--py-color)">Python no tiene tipo <code>char</code>.</strong> Un carácter individual es simplemente un string (<code>str</code>) de longitud 1. Se usan comillas simples o dobles indistintamente. Para enviar caracteres como bytes por serial se debe convertir con <code>.encode('utf-8')</code>.
+                                <div class="diff-badge flexible">✓ str — maneja texto de cualquier longitud</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- float -->
+                <div class="compare-card" onclick="this.classList.toggle('open')">
+                    <div class="compare-card-header">
+                        <span class="compare-symbol">float</span>
+                        <div>
+                            <h4>Tipo Flotante — Número con decimales</h4>
+                            <p>Representa valores reales con parte fraccionaria según estándar IEEE 754</p>
+                        </div>
+                    </div>
+                    <div class="compare-cols">
+                        <div class="compare-col cpp-col">
+                            <div class="col-lang-label cpp">C++ / Arduino</div>
+                            <pre><code><span class="type">float</span> distancia = <span class="number">12.75</span>;
+<span class="type">float</span> voltaje = <span class="number">4.95</span>;
+<span class="type">float</span> promedio = (distancia + voltaje) / <span class="number">2.0</span>;</code></pre>
+                            <div class="desc">
+                                <strong style="color:var(--cpp-color)">4 bytes / 32 bits</strong> (precisión simple IEEE 754). Aproximadamente 6-7 dígitos decimales de precisión. En Arduino se declara explícitamente y es crítico para el cálculo de distancias con sensores ultrasónicos.
+                                <div class="diff-badge strict">⚠ Precisión limitada: ~7 dígitos</div>
+                            </div>
+                        </div>
+                        <div class="compare-col py-col">
+                            <div class="col-lang-label py">Python 3</div>
+                            <pre><code>distancia = <span class="number">12.75</span>
+voltaje = <span class="number">4.95</span>
+promedio = (distancia + voltaje) / <span class="number">2</span>
+<span class="function">print</span>(<span class="function">type</span>(distancia)) <span class="comment"># &lt;class 'float'&gt;</span></code></pre>
+                            <div class="desc">
+                                <strong style="color:var(--py-color)">8 bytes / 64 bits</strong> (doble precisión). Python usa internamente el tipo <code>double</code> de C, lo que da ~15-17 dígitos decimales. No es necesario declarar el tipo: basta con escribir un número con punto decimal.
+                                <div class="diff-badge flexible">✓ Doble precisión: ~15 dígitos</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- {} llaves -->
+                <div class="compare-card" onclick="this.classList.toggle('open')">
+                    <div class="compare-card-header">
+                        <span class="compare-symbol">{&nbsp;}</span>
+                        <div>
+                            <h4>Llaves — Delimitadores de bloques de código</h4>
+                            <p>Definen el inicio y fin de un bloque lógico (función, condicional, bucle)</p>
+                        </div>
+                    </div>
+                    <div class="compare-cols">
+                        <div class="compare-col cpp-col">
+                            <div class="col-lang-label cpp">C++ / Arduino</div>
+                            <pre><code><span class="keyword">void</span> <span class="function">loop</span>() <span class="operator">{</span>
+  <span class="keyword">if</span> (sensor == <span class="number">1</span>) <span class="operator">{</span>
+    <span class="function">digitalWrite</span>(<span class="number">13</span>, HIGH);
+  <span class="operator">}</span>
+<span class="operator">}</span></code></pre>
+                            <div class="desc">
+                                En C++, las <strong style="color:var(--cpp-color)">llaves <code>{ }</code> son obligatorias</strong> para delimitar cualquier bloque de código. La apertura <code>{</code> marca el inicio y el cierre <code>}</code> marca el final. Sin ellas, solo la primera instrucción siguiente pertenece al bloque.
+                                <div class="diff-badge strict">⚠ Obligatorio — el compilador lo exige</div>
+                            </div>
+                        </div>
+                        <div class="compare-col py-col">
+                            <div class="col-lang-label py">Python 3</div>
+                            <pre><code><span class="keyword">def</span> <span class="function">loop</span>():
+    <span class="keyword">if</span> sensor == <span class="number">1</span>:
+        <span class="function">print</span>(<span class="string">"LED encendido"</span>)</code></pre>
+                            <div class="desc">
+                                Python <strong style="color:var(--py-color)">no usa llaves</strong>. El bloque de código se define mediante la <strong>indentación</strong> (sangría): 4 espacios por nivel. Un bloque mal indentado genera un error <code>IndentationError</code>. El <code>:</code> al final de la cabecera marca el inicio del bloque.
+                                <div class="diff-badge flexible">✓ Indentación — más legible, más limpio</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ; punto y coma -->
+                <div class="compare-card" onclick="this.classList.toggle('open')">
+                    <div class="compare-card-header">
+                        <span class="compare-symbol">;</span>
+                        <div>
+                            <h4>Punto y coma — Terminador de instrucción</h4>
+                            <p>Indica al compilador/intérprete que una sentencia ha concluido</p>
+                        </div>
+                    </div>
+                    <div class="compare-cols">
+                        <div class="compare-col cpp-col">
+                            <div class="col-lang-label cpp">C++ / Arduino</div>
+                            <pre><code><span class="type">int</span> x = <span class="number">10</span>;           <span class="comment">// ← ; obligatorio</span>
+<span class="function">digitalWrite</span>(<span class="number">13</span>, HIGH); <span class="comment">// ← ; obligatorio</span>
+<span class="function">delay</span>(<span class="number">1000</span>);           <span class="comment">// ← ; obligatorio</span>
+<span class="comment">// Olvidar el ; = ERROR de compilación</span></code></pre>
+                            <div class="desc">
+                                En C++, el <strong style="color:var(--cpp-color)">punto y coma <code>;</code> es obligatorio</strong> al final de cada instrucción. Sin él, el compilador lanza un error. Esto permite escribir varias instrucciones en una misma línea (aunque no es buena práctica). Es uno de los errores más comunes al aprender C++.
+                                <div class="diff-badge strict">⚠ Obligatorio — error de compilación si falta</div>
+                            </div>
+                        </div>
+                        <div class="compare-col py-col">
+                            <div class="col-lang-label py">Python 3</div>
+                            <pre><code>x = <span class="number">10</span>             <span class="comment"># sin ;</span>
+<span class="function">print</span>(<span class="string">"encendido"</span>)  <span class="comment"># sin ;</span>
+<span class="comment"># El salto de línea es el terminador</span>
+<span class="comment"># Puedes usar ; para múltiples en una línea (poco común):</span>
+a = <span class="number">1</span>; b = <span class="number">2</span>; c = <span class="number">3</span></code></pre>
+                            <div class="desc">
+                                Python usa el <strong style="color:var(--py-color)">salto de línea como terminador natural</strong>. El punto y coma es técnicamente válido pero no se usa en código idiomático Python. Esto hace que el código sea más limpio y legible. Para instrucciones largas se puede continuar en la siguiente línea usando <code>\</code>.
+                                <div class="diff-badge flexible">✓ No requerido — el enter es suficiente</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- * asterisco -->
+                <div class="compare-card" onclick="this.classList.toggle('open')">
+                    <div class="compare-card-header">
+                        <span class="compare-symbol">*</span>
+                        <div>
+                            <h4>Asterisco — Puntero, multiplicación y desempaque</h4>
+                            <p>Un símbolo con múltiples roles críticos en cada lenguaje</p>
+                        </div>
+                    </div>
+                    <div class="compare-cols">
+                        <div class="compare-col cpp-col">
+                            <div class="col-lang-label cpp">C++ / Arduino</div>
+                            <pre><code><span class="comment">// Multiplicación:</span>
+<span class="type">float</span> resultado = <span class="number">4.5</span> <span class="operator">*</span> <span class="number">2.0</span>;
+
+<span class="comment">// Declaración de puntero:</span>
+<span class="type">int</span> <span class="operator">*</span>puntero;
+
+<span class="comment">// Desreferencia (accede al valor):</span>
+<span class="type">int</span> valor = <span class="operator">*</span>puntero;</code></pre>
+                            <div class="desc">
+                                En C++, <code>*</code> tiene dos roles de puntero: al declarar una variable (<code>int *p</code>) crea un <strong>puntero</strong> que guarda una dirección de memoria; al usarlo sobre un puntero existente (<code>*p</code>) <strong>desreferencia</strong> esa dirección y accede al valor que contiene. Concepto fundamental para entender la memoria RAM.
+                                <div class="diff-badge note">★ Multiplicar + Punteros + Desreferenciar</div>
+                            </div>
+                        </div>
+                        <div class="compare-col py-col">
+                            <div class="col-lang-label py">Python 3</div>
+                            <pre><code><span class="comment"># Multiplicación:</span>
+resultado = <span class="number">4.5</span> <span class="operator">*</span> <span class="number">2.0</span>
+
+<span class="comment"># Potencia (doble asterisco):</span>
+cuadrado = <span class="number">3</span> <span class="operator">**</span> <span class="number">2</span>  <span class="comment"># → 9</span>
+
+<span class="comment"># Desempaque de listas:</span>
+nums = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]
+a, <span class="operator">*</span>resto = nums  <span class="comment"># a=1, resto=[2,3]</span></code></pre>
+                            <div class="desc">
+                                Python <strong style="color:var(--py-color)">no tiene punteros</strong>: la gestión de memoria es automática. El operador <code>*</code> multiplica, mientras que <code>**</code> eleva a una potencia. El asterisco también se usa para desempacar iterables en funciones o asignaciones múltiples. Mucho más seguro y sencillo.
+                                <div class="diff-badge flexible">✓ Sin punteros — memoria gestionada auto.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- & ampersand -->
+                <div class="compare-card" onclick="this.classList.toggle('open')">
+                    <div class="compare-card-header">
+                        <span class="compare-symbol">&amp;</span>
+                        <div>
+                            <h4>Ampersand — Referencia y operación bit a bit</h4>
+                            <p>Dirección de memoria en C++, operador AND binario en Python</p>
+                        </div>
+                    </div>
+                    <div class="compare-cols">
+                        <div class="compare-col cpp-col">
+                            <div class="col-lang-label cpp">C++ / Arduino</div>
+                            <pre><code><span class="comment">// Obtener dirección de memoria:</span>
+<span class="type">int</span> x = <span class="number">42</span>;
+<span class="type">int</span> <span class="operator">*</span>ptr = <span class="operator">&amp;</span>x;  <span class="comment">// ptr = 0x7ffe... (dirección)</span>
+
+<span class="comment">// Referencia (alias de variable):</span>
+<span class="type">int</span> <span class="operator">&amp;</span>ref = x;  <span class="comment">// ref ES x (mismo espacio)</span>
+
+<span class="comment">// AND a nivel de bits:</span>
+<span class="type">int</span> mask = <span class="number">0b1010</span> <span class="operator">&amp;</span> <span class="number">0b1100</span>; <span class="comment">// → 0b1000</span></code></pre>
+                            <div class="desc">
+                                En C++, <code>&</code> tiene tres usos. Como <strong>operador de dirección</strong>: retorna la dirección física en RAM de una variable. Como <strong>declarador de referencia</strong>: crea un alias (otro nombre) para la misma variable. Como <strong>operador AND bit a bit</strong>: compara los bits de dos enteros.
+                                <div class="diff-badge note">★ Dirección + Referencia + AND binario</div>
+                            </div>
+                        </div>
+                        <div class="compare-col py-col">
+                            <div class="col-lang-label py">Python 3</div>
+                            <pre><code><span class="comment"># AND a nivel de bits:</span>
+mask = <span class="number">0b1010</span> <span class="operator">&amp;</span> <span class="number">0b1100</span>  <span class="comment"># → 0b1000 = 8</span>
+
+<span class="comment"># Python no tiene operador de dirección</span>
+<span class="comment"># pero puedes ver el id (dirección interna):</span>
+x = <span class="number">42</span>
+<span class="function">print</span>(<span class="function">id</span>(x))  <span class="comment"># → 9789120 (dirección interna)</span>
+
+<span class="comment"># También: AND lógico (palabras)</span>
+<span class="keyword">if</span> a <span class="keyword">and</span> b:  <span class="comment"># Python usa "and" no &amp;&amp;</span>
+    <span class="function">print</span>(<span class="string">"ambos verdaderos"</span>)</code></pre>
+                            <div class="desc">
+                                En Python, <code>&</code> opera exclusivamente como <strong style="color:var(--py-color)">AND a nivel de bits</strong> (útil en programación de registros de hardware). Python no expone las direcciones de memoria directamente aunque <code>id()</code> devuelve un identificador interno. El AND lógico se escribe con la palabra <code>and</code>.
+                                <div class="diff-badge flexible">✓ Solo AND binario — sin acceso a RAM</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /comparación -->
+
+            <div class="concept-card" style="margin-top:20px;">
+                <h3>Tabla Resumen Rápida <span class="tag">Referencia</span></h3>
+                <div class="diagram-container">
+                    <div class="diagram-title"><i class="fa-solid fa-table"></i> Mapa de equivalencias C++ ↔ Python</div>
+                    <div class="pin-map">
+                        <div class="pin-line" style="font-weight:700;">
+                            <span style="color:var(--text-muted)">C++/Arduino</span>
+                            <span style="color:var(--cpp-color)">Python</span>
+                        </div>
+                        <div class="pin-line"><span>int edad = 25;</span><span style="color:#94a3b8">edad = 25</span></div>
+                        <div class="pin-line"><span>char c = 'A';</span><span style="color:#94a3b8">c = "A"</span></div>
+                        <div class="pin-line"><span>float v = 3.14;</span><span style="color:#94a3b8">v = 3.14</span></div>
+                        <div class="pin-line"><span>{ } bloques</span><span style="color:#94a3b8">indentación (4 espacios)</span></div>
+                        <div class="pin-line"><span>; terminador</span><span style="color:#94a3b8">salto de línea</span></div>
+                        <div class="pin-line"><span>* puntero</span><span style="color:#94a3b8">no existe / ** potencia</span></div>
+                        <div class="pin-line"><span>&amp; dirección</span><span style="color:#94a3b8">&amp; AND binario / id()</span></div>
+                        <div class="pin-line"><span>&amp;&amp; AND lógico</span><span style="color:#94a3b8">and (palabra reservada)</span></div>
+                        <div class="pin-line"><span>// comentario</span><span style="color:#94a3b8"># comentario</span></div>
+                    </div>
+                </div>
+                <div class="badge-task"><i class="fa-solid fa-star"></i> <strong>Ejercicio Mental:</strong> Toma cualquier bloque de código Arduino de las diapositivas siguientes e intenta reescribirlo mentalmente en Python, aplicando estas equivalencias. ¡La traducción entre lenguajes es una habilidad fundamental en sistemas embebidos!</div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════ DÍA 1 ═══════════════════ -->
+        <div id="dia1" class="slide-content">
+            <h1 class="main-title">Día 1: Entorno de Desarrollo y Asignación de Datos</h1>
+            <p class="subtitle">Configuración inicial del IDE Thonny y análisis de la gestión de memoria RAM en Python.</p>
+
+            <div class="concept-card">
+                <h3>Abstracción de Variables <span class="tag">Teoría de Software</span></h3>
+                <p>Una <strong>variable</strong> es un identificador o etiqueta vinculada a una dirección de memoria RAM destinada a almacenar un dato que puede cambiar durante la ejecución. Python gestiona esto mediante <strong>tipado dinámico</strong>: el intérprete asigna espacio automáticamente sin que el programador declare el tipo explícitamente.</p>
+
+                <div class="info-chips">
+                    <span class="chip blue">Tipado Dinámico</span>
+                    <span class="chip green">Garbage Collector</span>
+                    <span class="chip orange">Referencia por Objeto</span>
+                </div>
+
+                <div class="diagram-container">
+                    <div class="diagram-title"><i class="fa-solid fa-memory"></i> Mecanismo de Reasignación en Memoria RAM</div>
+                    <div class="diagram-flex">
+                        <div class="diagram-box">🏷️ Etiqueta<br><code>"usuario"</code></div>
+                        <div class="diagram-arrow">apunta ➔</div>
+                        <div class="diagram-box green">📦 0x01A2<br><code>"Carlos"</code></div>
+                        <div class="diagram-arrow">↓ reasignación</div>
+                        <div class="diagram-box orange">📦 0x03F8<br><code>"Elena"</code></div>
+                    </div>
+                </div>
+
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="lang-badge"><span class="lang-dot python"></span> Python 3</div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    </div>
+                    <pre><code><span class="comment"># Inicialización y reasignación de tipos String</span>
+usuario = <span class="string">"Carlos Mendoza"</span>
+<span class="function">print</span>(usuario)      <span class="comment"># → Carlos Mendoza</span>
+
+usuario = <span class="string">"Elena Torres"</span>   <span class="comment"># La etiqueta apunta a un nuevo objeto</span>
+<span class="function">print</span>(usuario)      <span class="comment"># → Elena Torres</span>
+
+<span class="comment"># Python elimina el objeto anterior de la memoria automáticamente (GC)</span>
+<span class="function">print</span>(<span class="function">type</span>(usuario)) <span class="comment"># → &lt;class 'str'&gt;</span></code></pre>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <h3>Inmutabilidad de Constantes</h3>
+                <p>Una <strong>constante</strong> es un valor que no debe cambiar durante la ejecución del programa. Python no posee la palabra clave <code>const</code> (como C++), por lo que se usa la <strong>convención PEP 8</strong>: identificadores completamente en MAYÚSCULAS. Es un acuerdo entre programadores, no una restricción del intérprete.</p>
+                <div class="code-wrapper">
+                    <div class="code-header">
+                        <div class="lang-badge"><span class="lang-dot python"></span> Python 3 — Constantes por convención</div>
+                        <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+                    </div>
+                    <pre><code><span class="comment"># Parámetros globales invariantivos del sistema</span>
+PI = <span class="number">3.141592653589793</span>
+UMBRAL_CRITICO = <span class="number">85.5</span>
+PUERTO_SERIAL = <span class="string">"COM3"</span>
+BAUDRATE = <span class="number">9600</span>
+
+<span class="comment"># ✗ MAL: Nunca hagas esto (rompe la convención)</span>
+<span class="comment"># pi = 3.14</span>
+
+<span class="comment"># ✓ BIEN: Acceso sin modificación</span>
+area = PI * (<span class="number">5</span> ** <span class="number">2</span>)
+<span class="function">print</span>(<span class="string">f"Área del círculo: {area:.4f} cm²"</span>)</code></pre>
+                </div>
+            </div>
+
+            <div class="badge-task"><i class="fa-solid fa-star"></i> <strong>Práctica:</strong> Declarar tres identificadores de cadena de texto independientes (nombre, apellido, ciudad), formatear una salida usando f-strings y mostrar el tipo de dato de cada variable con <code>type()</code>.</div>
+        </div>
+
+        <!-- ═══════════════════ DÍA 2 ═══════════════════ -->
+        <div id="dia2" class="slide-content">
+            <h1 class="main-title">Día 2: Tipos de Datos Numéricos Avanzados</h1>
+            <p class="subtitle">Estudio analítico de magnitudes discretas y continuas en el procesamiento de variables de sensores.</p>
+
+            <div class="concept-card">
+                <h3>Análisis de tipos: int y float <span class="tag">Estructura de Datos</span></h3>
+
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab(this,'t2-int')"><i class="fa-solid fa-hashtag"></i> Entero (int)</button>
+                    <button class="tab-btn" onclick="switchTab(this,'t2-float')"><i class="fa-solid fa-percentage"></i> Flotante (float)</button>
+                    <button class="tab-btn" onclick="switchTab(this,'t2-mixed')"><i class="fa-solid fa-arrows-left-right"></i> Conversión</button>
+                </div>
+
+                <div id="t2-int" class="tab-panel active">
+                    <p><strong>Entero (int):</strong> Representa magnitudes enteras sin parte decimal. Ideal para contadores, índices, estados de pines digitales (<code>HIGH/LOW = 1/0</code>) y cualquier valor donde la fracción no tiene sentido físico.</p>
+                    <div class="stat-row">
+                        <div class="stat-box"><div class="stat-val">∞</div><div class="stat-lbl">Rango en Python</div></div>
+                        <div class="stat-box"><div class="stat-val">4B</div><div class="stat-lbl">Tamaño en C++ (int)</div></div>
+                        <div class="stat-box"><div class="stat-val">0</div><div class="stat-lbl">Dígitos decimales</div></div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header"><div class="lang-badge"><span class="lang-dot python"></span> Python — int</div><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                        <pre><code>pin_led = <span class="number">13</span>          <span class="comment"># número de pin</span>
+contador_ciclos = <span class="number">0</span>   <span class="comment"># índice de bucle</span>
+estado = <span class="number">1</span>            <span class="comment"># HIGH = 1, LOW = 0</span>
+
+<span class="comment"># Python no tiene límite de tamaño:</span>
+numero_grande = <span class="number">10</span> ** <span class="number">100</span>  <span class="comment"># ¡Googol! Sin desbordamiento</span></code></pre>
+                    </div>
+                </div>
+
+                <div id="t2-float" class="tab-panel">
+                    <p><strong>Flotante (float):</strong> Representa números reales que incluyen porciones fraccionarias. Basados en el estándar <strong>IEEE 754</strong>. Son fundamentales en cálculos de sensores analógicos, conversión de voltaje y cálculo de distancias.</p>
+                    <div class="stat-row">
+                        <div class="stat-box"><div class="stat-val">64b</div><div class="stat-lbl">Tamaño Python float</div></div>
+                        <div class="stat-box"><div class="stat-val">15-17</div><div class="stat-lbl">Dígitos de precisión</div></div>
+                        <div class="stat-box"><div class="stat-val">±1.8e308</div><div class="stat-lbl">Rango máximo</div></div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header"><div class="lang-badge"><span class="lang-dot python"></span> Python — float</div><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                        <pre><code>voltaje = <span class="number">4.95</span>          <span class="comment"># lectura analógica</span>
+distancia_cm = <span class="number">12.347</span>   <span class="comment"># resultado de sensor</span>
+
+<span class="comment"># Verificación del tipo</span>
+<span class="function">print</span>(<span class="function">type</span>(voltaje))    <span class="comment"># → &lt;class 'float'&gt;</span>
+<span class="function">print</span>(<span class="function">round</span>(distancia_cm, <span class="number">2</span>)) <span class="comment"># → 12.35</span></code></pre>
+                    </div>
+                </div>
+
+                <div id="t2-mixed" class="tab-panel">
+                    <p><strong>Conversión (Casting):</strong> Python promueve automáticamente el tipo en operaciones mixtas. Si un <code>int</code> y un <code>float</code> interactúan, el resultado siempre es <code>float</code> para evitar pérdida de información.</p>
+                    <div class="diagram-container">
+                        <div class="diagram-title"><i class="fa-solid fa-calculator"></i> Promoción Automática de Tipos</div>
+                        <div class="diagram-flex">
+                            <div class="diagram-box">int (120)</div>
+                            <div class="diagram-arrow">× float (15.75) →</div>
+                            <div class="diagram-box green">float (1890.0)</div>
+                        </div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header"><div class="lang-badge"><span class="lang-dot python"></span> Python — Casting explícito</div><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                        <pre><code>unidades = <span class="number">120</span>          <span class="comment"># int</span>
+precio = <span class="number">15.75</span>          <span class="comment"># float</span>
+total = unidades * precio <span class="comment"># → float automáticamente</span>
+
+<span class="comment"># Casting explícito (cuando el usuario escribe texto):</span>
+entrada = <span class="function">input</span>(<span class="string">"Voltaje medido: "</span>)
+voltaje = <span class="function">float</span>(entrada)  <span class="comment"># Convierte "4.5" → 4.5</span>
+entero = <span class="function">int</span>(<span class="number">4.9</span>)         <span class="comment"># Trunca: → 4 (¡no redondea!)</span></code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="badge-task"><i class="fa-solid fa-star"></i> <strong>Práctica:</strong> Desarrollar un script que capture entradas con <code>input()</code>, realice casteo explícito a float y calcule el voltaje promedio de 3 mediciones de sensores.</div>
+        </div>
+
+        <!-- ═══════════════════ DÍA 3 ═══════════════════ -->
+        <div id="dia3" class="slide-content">
+            <h1 class="main-title">Día 3: Estructuras de Control Condicionales</h1>
+            <p class="subtitle">Implementación de bifurcaciones lógicas mediante operadores de comparación y evaluación booleana.</p>
+
+            <div class="concept-card">
+                <h3>Arquitectura de Toma de Decisiones (IF · ELIF · ELSE) <span class="tag">Control de Flujo</span></h3>
+                <p>Las estructuras condicionales <strong>alteran el flujo lineal de ejecución de la CPU</strong> al evaluar expresiones booleanas. Si el resultado es <code>True</code>, se ejecuta el bloque indentado correspondiente y se ignoran las demás ramas.</p>
+                <p>Python evalúa las condiciones de <strong>arriba hacia abajo</strong>: al encontrar la primera condición verdadera, ejecuta su bloque y <em>salta el resto</em>, sin evaluarlas.</p>
+
+                <div class="diagram-container">
+                    <div class="diagram-title"><i class="fa-solid fa-diagram-project"></i> Árbol de Decisión — Monitoreo de Voltaje</div>
+                    <div class="diagram-flex">
+                        <div class="diagram-box">⚡ Voltaje leído</div>
+                        <div class="diagram-arrow">➔</div>
+                        <div class="diagram-box orange">¿> 4.5V?</div>
+                        <div class="diagram-arrow">SI ➔</div>
+                        <div class="diagram-box" style="border-color:var(--accent-red)">🔴 ALERTA</div>
+                    </div>
+                    <div class="diagram-flex" style="margin-top:-4px;">
+                        <div style="min-width:120px;"></div>
+                        <div class="diagram-arrow" style="transform:rotate(90deg); margin:0 40px;">➔</div>
+                        <div class="diagram-box yellow">¿≥ 3.0V?</div>
+                        <div class="diagram-arrow">SI ➔</div>
+                        <div class="diagram-box green">🟢 NOMINAL</div>
+                    </div>
+                    <div class="diagram-flex" style="margin-top:-4px;">
+                        <div style="min-width:300px;"></div>
+                        <div class="diagram-arrow">NO ➔</div>
+                        <div class="diagram-box purple">🟣 FALLA</div>
+                    </div>
+                </div>
+
+                <div class="code-wrapper">
+                    <div class="code-header"><div class="lang-badge"><span class="lang-dot python"></span> Python — Sistema de Monitoreo</div><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                    <pre><code>voltaje_leido = <span class="number">4.2</span>
+
+<span class="keyword">if</span> voltaje_leido > <span class="number">4.5</span>:
+    <span class="function">print</span>(<span class="string">"🔴 ALERTA: Sobrevoltaje detectado"</span>)
+<span class="keyword">elif</span> voltaje_leido >= <span class="number">3.0</span>:
+    <span class="function">print</span>(<span class="string">"🟢 Operación Nominal del Sistema"</span>)
+<span class="keyword">else</span>:
+    <span class="function">print</span>(<span class="string">"🟣 Falla de Potencia: Voltaje insuficiente"</span>)
+
+<span class="comment"># Operadores lógicos compuestos:</span>
+<span class="keyword">if</span> voltaje_leido >= <span class="number">3.0</span> <span class="keyword">and</span> voltaje_leido <= <span class="number">4.5</span>:
+    <span class="function">print</span>(<span class="string">"Rango operativo seguro"</span>)</code></pre>
+                </div>
+
+                <div class="reveal-card" onclick="this.classList.toggle('open')">
+                    <div class="reveal-hint"><i class="fa-solid fa-lightbulb"></i> Haz clic para ver los operadores de comparación disponibles</div>
+                    <div class="reveal-content">
+                        <div class="pin-map">
+                            <div class="pin-line"><span>==</span><span>Igualdad (compara valores)</span></div>
+                            <div class="pin-line"><span>!=</span><span>Diferente / distinto de</span></div>
+                            <div class="pin-line"><span>&gt; / &lt;</span><span>Mayor que / Menor que</span></div>
+                            <div class="pin-line"><span>&gt;= / &lt;=</span><span>Mayor o igual / Menor o igual</span></div>
+                            <div class="pin-line"><span>and</span><span>Ambas condiciones deben ser True</span></div>
+                            <div class="pin-line"><span>or</span><span>Al menos una condición debe ser True</span></div>
+                            <div class="pin-line"><span>not</span><span>Invierte el resultado booleano</span></div>
+                            <div class="pin-line"><span>in</span><span>Verifica pertenencia en una colección</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="badge-task"><i class="fa-solid fa-star"></i> <strong>Práctica:</strong> Programar un sistema que combine variables analógicas simuladas con operadores <code>and</code>, <code>or</code> y <code>not</code> para clasificar lecturas de temperatura + humedad en tres niveles de alerta.</div>
+        </div>
+
+        <!-- ═══════════════════ DÍA 4 ═══════════════════ -->
+        <div id="dia4" class="slide-content">
+            <h1 class="main-title">Día 4: Estructuras Cíclicas e Iteraciones</h1>
+            <p class="subtitle">Control repetitivo y optimización de rutinas mediante bucles condicionados e iteradores.</p>
+
+            <div class="concept-card">
+                <h3>Mecánica de Bucles While y For <span class="tag">Algoritmia</span></h3>
+
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab(this,'t4-while')">🔄 Bucle WHILE</button>
+                    <button class="tab-btn" onclick="switchTab(this,'t4-for')">🔢 Bucle FOR</button>
+                    <button class="tab-btn" onclick="switchTab(this,'t4-control')">⚡ break / continue</button>
+                </div>
+
+                <div id="t4-while" class="tab-panel active">
+                    <p><strong>Bucle WHILE:</strong> Itera indefinidamente mientras una condición lógica sea verdadera. Requiere una <strong>variable de control</strong> que mute en cada iteración para prevenir bucles infinitos que bloqueen el CPU.</p>
+                    <div class="diagram-container">
+                        <div class="diagram-title"><i class="fa-solid fa-rotate-right"></i> Ciclo While — Diagrama de Flujo</div>
+                        <div class="diagram-flex">
+                            <div class="diagram-box orange">Evalúa condición</div>
+                            <div class="diagram-arrow">True ➔</div>
+                            <div class="diagram-box green">Ejecuta bloque</div>
+                            <div class="diagram-arrow">➔ Incrementa ➔ Volver</div>
+                        </div>
+                        <div style="text-align:center;font-size:12px;color:var(--text-muted);margin-top:8px;">↓ False → Sale del bucle</div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header"><div class="lang-badge"><span class="lang-dot python"></span> Python — while</div><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                        <pre><code>contador = <span class="number">0</span>
+<span class="keyword">while</span> contador &lt; <span class="number">5</span>:
+    <span class="function">print</span>(<span class="string">f"Ciclo de procesamiento #{contador}"</span>)
+    contador += <span class="number">1</span>  <span class="comment"># ← CRÍTICO: sin esto → bucle infinito</span>
+
+<span class="comment"># While True: bucle de monitoreo continuo (como loop() en Arduino)</span>
+<span class="keyword">while</span> <span class="keyword">True</span>:
+    lectura = leer_sensor()
+    <span class="keyword">if</span> lectura > <span class="number">100</span>:
+        <span class="keyword">break</span>  <span class="comment"># Salida controlada</span></code></pre>
+                    </div>
+                </div>
+
+                <div id="t4-for" class="tab-panel">
+                    <p><strong>Bucle FOR:</strong> Itera sobre una secuencia de elementos o un rango definido de números. Más seguro que el while porque el número de iteraciones está predefinido.</p>
+                    <div class="code-wrapper">
+                        <div class="code-header"><div class="lang-badge"><span class="lang-dot python"></span> Python — for con range()</div><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                        <pre><code><span class="comment"># Iterar un número fijo de veces:</span>
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="number">10</span>):
+    <span class="function">print</span>(<span class="string">f"Muestra #{i}: {leer_sensor()}"</span>)
+
+<span class="comment"># Iterar sobre una lista de pines:</span>
+pines_led = [<span class="number">10</span>, <span class="number">11</span>, <span class="number">12</span>, <span class="number">13</span>]
+<span class="keyword">for</span> pin <span class="keyword">in</span> pines_led:
+    <span class="function">print</span>(<span class="string">f"Activando pin {pin}"</span>)
+
+<span class="comment"># range(inicio, fin, paso):</span>
+<span class="keyword">for</span> frecuencia <span class="keyword">in</span> <span class="function">range</span>(<span class="number">200</span>, <span class="number">1000</span>, <span class="number">50</span>):
+    <span class="function">print</span>(<span class="string">f"Frecuencia: {frecuencia} Hz"</span>)</code></pre>
+                    </div>
+                </div>
+
+                <div id="t4-control" class="tab-panel">
+                    <p>Las instrucciones de control alteran el flujo normal de un bucle sin romper la estructura completa del programa:</p>
+                    <div class="pin-map" style="margin-bottom:14px;">
+                        <div class="pin-line"><span>break</span><span>Sale completamente del bucle</span></div>
+                        <div class="pin-line"><span>continue</span><span>Salta a la siguiente iteración</span></div>
+                        <div class="pin-line"><span>pass</span><span>No hace nada (marcador de posición)</span></div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header"><div class="lang-badge"><span class="lang-dot python"></span> Python — control de flujo avanzado</div><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                        <pre><code><span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="number">100</span>):
+    lectura = leer_sensor(i)
+
+    <span class="keyword">if</span> lectura &lt; <span class="number">0</span>:
+        <span class="keyword">continue</span>   <span class="comment"># Ignora lecturas negativas (inválidas)</span>
+
+    <span class="keyword">if</span> lectura > <span class="number">999</span>:
+        <span class="keyword">break</span>      <span class="comment"># Desbordamiento: detiene el ciclo completo</span>
+
+    <span class="function">procesar</span>(lectura)</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="badge-task"><i class="fa-solid fa-star"></i> <strong>Práctica:</strong> Desarrollar una cuenta regresiva de 10 a 0 usando while, que imprima "¡Lanzamiento!" al finalizar, y luego repetirla usando for con range() en sentido inverso.</div>
+        </div>
+
+        <!-- ═══════════════════ DÍA 5 ═══════════════════ -->
+        <div id="dia5" class="slide-content">
+            <h1 class="main-title">Día 5: Arquitectura de Microcontroladores y Salidas Digitales</h1>
+            <p class="subtitle">Análisis de hardware, flujo eléctrico y modulación de estados lógicos en registros GPIO.</p>
+
+            <div class="concept-card">
+                <h3>Componentes Críticos del Circuito <span class="tag">Teoría de Circuitos</span></h3>
+                <div class="info-chips">
+                    <span class="chip blue">💡 LED</span>
+                    <span class="chip orange">⚡ Resistencia</span>
+                    <span class="chip green">🔌 Protoboard</span>
+                    <span class="chip purple">🎛️ Arduino</span>
+                </div>
+                <ul>
+                    <li><strong>LED (Diodo Emisor de Luz):</strong> Semiconductor que emite fotones al polarizarse directamente. Terminal positivo (<strong>Ánodo</strong>) = pata más larga. Terminal negativo (<strong>Cátodo</strong>) = pata más corta + chaflán plano. Opera típicamente con 2-3V y 20mA.</li>
+                    <li><strong>Resistencia Limitadora (220Ω):</strong> Por la Ley de Ohm: <code>R = (Vsrc − Vled) / Iled = (5V − 2V) / 0.02A = 150Ω</code>. Se usa 220Ω por seguridad. Sin ella, el LED se destruye en milisegundos.</li>
+                    <li><strong>Protoboard:</strong> Filas A-E y F-J conectadas verticalmente en columnas centrales. Los buses laterales (+/-) conectados horizontalmente. Permite prototipar sin soldadura.</li>
+                </ul>
+
+                <div class="diagram-container">
+                    <div class="diagram-title"><i class="fa-solid fa-circle-nodes"></i> Circuito Blink — Flujo de Corriente</div>
+                    <div class="pin-map">
+                        <div class="pin-line"><span>[Pin 13 · HIGH]</span> <span>➔ Saca 5V exactos del registro GPIO</span></div>
+                        <div class="pin-line"><span>[Resistencia 220Ω]</span> <span>➔ Limita la corriente a ~14mA seguros</span></div>
+                        <div class="pin-line"><span>[Ánodo LED (+)]</span> <span>➔ Recibe corriente regulada</span></div>
+                        <div class="pin-line"><span>[Cátodo LED (-)]</span> <span>➔ Devuelve corriente residual</span></div>
+                        <div class="pin-line"><span>[Pin GND]</span> <span>➔ Masa de referencia · cierra el lazo eléctrico</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <h3>Firmware Base en C++ (Arduino) <span class="tag">Código Base</span></h3>
+                <p>El compilador de Arduino transforma el C++ en instrucciones de máquina AVR. Dos funciones son obligatorias:</p>
+                <div class="code-wrapper">
+                    <div class="code-header"><div class="lang-badge"><span class="lang-dot arduino"></span> C++ / Arduino IDE</div><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                    <pre><code><span class="comment">// setup(): se ejecuta UNA VEZ al energizar o presionar Reset</span>
+<span class="keyword">void</span> <span class="function">setup</span>() {
+  <span class="function">pinMode</span>(<span class="number">13</span>, OUTPUT); <span class="comment">// Configura GPIO 13 como SALIDA de corriente</span>
+}
+
+<span class="comment">// loop(): bucle infinito a 16 MHz (≈ 16,000,000 veces por segundo)</span>
+<span class="keyword">void</span> <span class="function">loop</span>() {
+  <span class="function">digitalWrite</span>(<span class="number">13</span>, HIGH); <span class="comment">// Registro GPIO → 5V (encendido)</span>
+  <span class="function">delay</span>(<span class="number">1000</span>);             <span class="comment">// Pausa 1000ms bloqueando el CPU</span>
+  <span class="function">digitalWrite</span>(<span class="number">13</span>, LOW);  <span class="comment">// Registro GPIO → 0V (apagado)</span>
+  <span class="function">delay</span>(<span class="number">1000</span>);
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="badge-task"><i class="fa-solid fa-star"></i> <strong>Práctica:</strong> Modificar los delays para crear un patrón asimétrico: 200ms encendido / 1800ms apagado. Luego calcular cuántas veces parpadeará por minuto.</div>
+        </div>
+
+        <!-- ═══════════════════ DÍA 6 ═══════════════════ -->
+        <div id="dia6" class="slide-content">
+            <h1 class="main-title">Día 6: Automatización de Secuencias Multicanal</h1>
+            <p class="subtitle">Gestión coordinada de múltiples buses GPIO e interconexión de arreglos lógicos discretos.</p>
+
+            <div class="concept-card">
+                <h3>Sincronización Secuencial Cruzada <span class="tag">Sistemas de Control</span></h3>
+                <p>Al controlar múltiples actuadores simultáneamente (semáforo de 3 canales), se implementan <strong>matrices de temporización</strong> que deben garantizar exclusión mutua: nunca verde y rojo activos al mismo tiempo, ya que eso representaría una falla crítica del sistema.</p>
+
+                <div class="diagram-container">
+                    <div class="diagram-title"><i class="fa-solid fa-traffic-light"></i> Secuencia de Temporización del Semáforo</div>
+                    <div class="pin-map">
+                        <div class="pin-line"><span>[Pin 12 · Rojo]</span><span>HIGH por 3000ms → LOW · Fase de STOP</span></div>
+                        <div class="pin-line"><span>[Pin 10 · Verde]</span><span>HIGH por 3000ms → LOW · Fase de PASO</span></div>
+                        <div class="pin-line"><span>[Pin 11 · Amarillo]</span><span>HIGH por 1000ms → LOW · Fase de PRECAUCIÓN</span></div>
+                        <div class="pin-line"><span>[Ciclo total]</span><span>7000ms por ciclo completo (≈ 8.5 ciclos/min)</span></div>
+                    </div>
+                </div>
+
+                <div class="code-wrapper">
+                    <div class="code-header"><div class="lang-badge"><span class="lang-dot arduino"></span> C++ / Arduino — Semáforo 3 canales</div><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                    <pre><code><span class="keyword">void</span> <span class="function">setup</span>() {
+  <span class="function">pinMode</span>(<span class="number">12</span>, OUTPUT); <span class="comment">// Rojo</span>
+  <span class="function">pinMode</span>(<span class="number">11</span>, OUTPUT); <span class="comment">// Amarillo</span>
+  <span class="function">pinMode</span>(<span class="number">10</span>, OUTPUT); <span class="comment">// Verde</span>
+}
+
+<span class="keyword">void</span> <span class="function">loop</span>() {
+  <span class="function">digitalWrite</span>(<span class="number">12</span>, HIGH); <span class="function">delay</span>(<span class="number">3000</span>); <span class="function">digitalWrite</span>(<span class="number">12</span>, LOW); <span class="comment">// 🔴 Rojo</span>
+  <span class="function">digitalWrite</span>(<span class="number">10</span>, HIGH); <span class="function">delay</span>(<span class="number">3000</span>); <span class="function">digitalWrite</span>(<span class="number">10</span>, LOW); <span class="comment">// 🟢 Verde</span>
+  <span class="function">digitalWrite</span>(<span class="number">11</span>, HIGH); <span class="function">delay</span>(<span class="number">1000</span>); <span class="function">digitalWrite</span>(<span class="number">11</span>, LOW); <span class="comment">// 🟡 Amarillo</span>
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="badge-task"><i class="fa-solid fa-star"></i> <strong>Práctica:</strong> Añadir un cuarto LED (azul, pin 9) que represente una fase de "Peatones cruzando" entre el rojo y el verde, con duración de 2000ms.</div>
+        </div>
+
+        <!-- ═══════════════════ DÍA 7 ═══════════════════ -->
+        <div id="dia7" class="slide-content">
+            <h1 class="main-title">Día 7: Adquisición de Señales Digitales (Entradas)</h1>
+            <p class="subtitle">Monitoreo de eventos externos, acoplamiento de impedancias y mitigación de ruido electromagnético.</p>
+
+            <div class="concept-card">
+                <h3>Estados de Flotación y Resistencias de Acoplamiento <span class="tag">Instrumentación</span></h3>
+                <p>Cuando un pin se configura como entrada (<code>INPUT</code>), adquiere <strong>alta impedancia interna (~∞Ω)</strong>. Sin una referencia de voltaje fija, el pin actúa como antena captando ruido electromagnético ambiental, generando transiciones aleatorias entre 0 y 1 conocidas como <em>estado flotante</em>.</p>
+
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab(this,'t7-pulldown')">⬇️ Pull-Down</button>
+                    <button class="tab-btn" onclick="switchTab(this,'t7-pullup')">⬆️ Pull-Up Interno</button>
+                </div>
+
+                <div id="t7-pulldown" class="tab-panel active">
+                    <p><strong>Pull-Down externo:</strong> Una resistencia de 10kΩ conectada entre el pin y GND fuerza el nivel bajo (0V) cuando el pulsador está abierto. Al presionar el botón, el pin se conecta directamente a VCC (5V) leyendo HIGH.</p>
+                    <div class="diagram-container">
+                        <div class="diagram-title"><i class="fa-solid fa-shield"></i> Pull-Down — Comportamiento</div>
+                        <div class="diagram-flex">
+                            <div class="diagram-box">Pulsador ABIERTO</div>
+                            <div class="diagram-arrow">R a GND ➔</div>
+                            <div class="diagram-box green">LOW estable (0V)</div>
+                            <div class="diagram-arrow">Presionar ➔</div>
+                            <div class="diagram-box orange">HIGH (5V)</div>
+                        </div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header"><div class="lang-badge"><span class="lang-dot arduino"></span> C++ — Pull-Down externo</div><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                        <pre><code><span class="keyword">void</span> <span class="function">setup</span>() {
+  <span class="function">pinMode</span>(<span class="number">2</span>, INPUT);    <span class="comment">// Requiere resistencia 10kΩ a GND en protoboard</span>
+  <span class="function">pinMode</span>(<span class="number">13</span>, OUTPUT);
+}
+<span class="keyword">void</span> <span class="function">loop</span>() {
+  <span class="type">int</span> estado = <span class="function">digitalRead</span>(<span class="number">2</span>);
+  <span class="function">digitalWrite</span>(<span class="number">13</span>, estado); <span class="comment">// LED sigue al botón</span>
+}</code></pre>
+                    </div>
+                </div>
+
+                <div id="t7-pullup" class="tab-panel">
+                    <p><strong>Pull-Up interno:</strong> Arduino incluye resistencias de 20kΩ internamente que se activan por software con <code>INPUT_PULLUP</code>. Conecta el pin a VCC internamente: pin libre = HIGH, botón presionado = LOW (lógica invertida).</p>
+                    <div class="code-wrapper">
+                        <div class="code-header"><div class="lang-badge"><span class="lang-dot arduino"></span> C++ — INPUT_PULLUP interno</div><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                        <pre><code><span class="keyword">void</span> <span class="function">setup</span>() {
+  <span class="function">pinMode</span>(<span class="number">2</span>, INPUT_PULLUP); <span class="comment">// Resistencia interna de 20kΩ → VCC</span>
+  <span class="function">pinMode</span>(<span class="number">13</span>, OUTPUT);
+}
+<span class="keyword">void</span> <span class="function">loop</span>() {
+  <span class="type">int</span> estado = <span class="function">digitalRead</span>(<span class="number">2</span>);
+  <span class="comment">// ¡Lógica invertida! LOW = presionado, HIGH = libre</span>
+  <span class="keyword">if</span> (estado == LOW) {
+    <span class="function">digitalWrite</span>(<span class="number">13</span>, HIGH); <span class="comment">// LED encendido</span>
+  } <span class="keyword">else</span> {
+    <span class="function">digitalWrite</span>(<span class="number">13</span>, LOW);
+  }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="badge-task"><i class="fa-solid fa-star"></i> <strong>Práctica:</strong> Implementar un contador de pulsaciones usando INPUT_PULLUP. Cada vez que se presione el botón, incrementar un contador y enviarlo por Serial Monitor.</div>
+        </div>
+
+        <!-- ═══════════════════ DÍA 8 ═══════════════════ -->
+        <div id="dia8" class="slide-content">
+            <h1 class="main-title">Día 8: Modulación de Frecuencias de Audio</h1>
+            <p class="subtitle">Uso de transductores piezoeléctricos para la generación de ondas cuadradas de audio controladas.</p>
+
+            <div class="concept-card">
+                <h3>Buzzer Piezoeléctrico y la Función tone() <span class="tag">Física Aplicada</span></h3>
+                <p>Un <strong>buzzer piezoeléctrico</strong> contiene un cristal que se deforma mecánicamente al recibir voltaje. Una señal digital oscilatoria (onda cuadrada) lo hace vibrar a la frecuencia dada, desplazando el aire y generando ondas acústicas.</p>
+
+                <div class="info-chips">
+                    <span class="chip blue">261 Hz → Do (C4)</span>
+                    <span class="chip green">440 Hz → La (A4)</span>
+                    <span class="chip orange">493 Hz → Si (B4)</span>
+                    <span class="chip purple">1000 Hz → Alarma</span>
+                </div>
+
+                <div class="diagram-container">
+                    <div class="diagram-title"><i class="fa-solid fa-wave-square"></i> Relación Frecuencia ↔ Tono Musical</div>
+                    <div class="diagram-flex">
+                        <div class="diagram-box">📉 261 Hz<br><small>Tono grave</small></div>
+                        <div class="diagram-arrow">➔ más Hz ➔</div>
+                        <div class="diagram-box yellow">440 Hz<br><small>La estándar</small></div>
+                        <div class="diagram-arrow">➔ más Hz ➔</div>
+                        <div class="diagram-box orange">📈 1000 Hz<br><small>Alarma aguda</small></div>
+                    </div>
+                </div>
+
+                <div class="code-wrapper">
+                    <div class="code-header"><div class="lang-badge"><span class="lang-dot arduino"></span> C++ / Arduino — Secuencia Musical</div><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                    <pre><code><span class="type">int</span> notas[] = {<span class="number">261</span>, <span class="number">294</span>, <span class="number">330</span>, <span class="number">349</span>, <span class="number">392</span>, <span class="number">440</span>, <span class="number">494</span>}; <span class="comment">// Do Re Mi Fa Sol La Si</span>
+<span class="type">int</span> duracion = <span class="number">400</span>;
+
+<span class="keyword">void</span> <span class="function">setup</span>() {}
+
+<span class="keyword">void</span> <span class="function">loop</span>() {
+  <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">7</span>; i++) {
+    <span class="function">tone</span>(<span class="number">9</span>, notas[i], duracion); <span class="comment">// pin, frecuencia, duración_ms</span>
+    <span class="function">delay</span>(duracion + <span class="number">50</span>);        <span class="comment">// pequeña pausa entre notas</span>
+  }
+  <span class="function">noTone</span>(<span class="number">9</span>);  <span class="comment">// Detiene la generación de onda</span>
+  <span class="function">delay</span>(<span class="number">2000</span>);
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="badge-task"><i class="fa-solid fa-star"></i> <strong>Práctica:</strong> Programar una alarma de proximidad que emita pulsos a 800 Hz y 1200 Hz alternados, simulando el sensor de reversa de un automóvil.</div>
+        </div>
+
+        <!-- ═══════════════════ DÍA 9 ═══════════════════ -->
+        <div id="dia9" class="slide-content">
+            <h1 class="main-title">Día 9: Telemetría por Ultrasonido (HC-SR04)</h1>
+            <p class="subtitle">Cálculo del tiempo de vuelo de ondas acústicas para determinar distancias absolutas en tiempo real.</p>
+
+            <div class="concept-card">
+                <h3>Principio de Eco-Localización <span class="tag">Teoría de Ondas</span></h3>
+                <p>El sensor HC-SR04 usa el mismo principio que los murciélagos: emite un pulso ultrasónico (40kHz, inaudible) y mide el tiempo que tarda el eco en regresar. Con la velocidad del sonido conocida, calcula la distancia exacta.</p>
+
+                <div class="stat-row">
+                    <div class="stat-box"><div class="stat-val">40kHz</div><div class="stat-lbl">Frecuencia del pulso</div></div>
+                    <div class="stat-box"><div class="stat-val">343 m/s</div><div class="stat-lbl">Velocidad del sonido</div></div>
+                    <div class="stat-box"><div class="stat-val">÷ 58.2</div><div class="stat-lbl">Factor de conversión (μs→cm)</div></div>
+                </div>
+
+                <div class="reveal-card" onclick="this.classList.toggle('open')">
+                    <div class="reveal-hint"><i class="fa-solid fa-flask"></i> Haz clic para ver la derivación matemática de la constante 58.2</div>
+                    <div class="reveal-content">
+                        <div class="pin-map">
+                            <div class="pin-line"><span>Velocidad</span><span>343 m/s = 0.0343 cm/μs</span></div>
+                            <div class="pin-line"><span>Ida + vuelta</span><span>El tiempo medido incluye trayectoria doble</span></div>
+                            <div class="pin-line"><span>Fórmula</span><span>Distancia = (tiempo_μs × 0.0343) / 2</span></div>
+                            <div class="pin-line"><span>Equivalente</span><span>Distancia = tiempo_μs / 58.2</span></div>
+                            <div class="pin-line"><span>Por qué 58.2</span><span>2 / 0.0343 ≈ 58.3</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="diagram-container">
+                    <div class="diagram-title"><i class="fa-solid fa-wave-square"></i> Secuencia de Telemetría Acústica</div>
+                    <div class="pin-map">
+                        <div class="pin-line"><span>[Trigger: 10μs]</span><span>➔ Microcontrolador activa el transductor</span></div>
+                        <div class="pin-line"><span>[Transmisor T]</span><span>➔ Emite ráfaga de 8 pulsos a 40 kHz</span></div>
+                        <div class="pin-line"><span>[Echo → HIGH]</span><span>➔ Pin empieza a contar microsegundos</span></div>
+                        <div class="pin-line"><span>[Rebote]</span><span>➔ Onda golpea el objeto y regresa</span></div>
+                        <div class="pin-line"><span>[Echo → LOW]</span><span>➔ Para el conteo; pulseIn() retorna el tiempo</span></div>
+                        <div class="pin-line"><span>[Cálculo]</span><span>➔ Distancia (cm) = tiempo_μs / 58.2</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <h3>Firmware de Medición Métrica <span class="tag">Código de Control</span></h3>
+                <div class="code-wrapper">
+                    <div class="code-header"><div class="lang-badge"><span class="lang-dot arduino"></span> C++ / Arduino — HC-SR04</div><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                    <pre><code><span class="type">const int</span> pinTrigger = <span class="number">9</span>;
+<span class="type">const int</span> pinEcho    = <span class="number">8</span>;
+<span class="type">long</span>  duracion;
+<span class="type">float</span> distancia;
+
+<span class="keyword">void</span> <span class="function">setup</span>() {
+  <span class="function">pinMode</span>(pinTrigger, OUTPUT);
+  <span class="function">pinMode</span>(pinEcho,    INPUT);
+  <span class="function">Serial</span>.<span class="function">begin</span>(<span class="number">9600</span>);
+}
+
+<span class="keyword">void</span> <span class="function">loop</span>() {
+  <span class="comment">// Generar pulso de disparo de 10μs</span>
+  <span class="function">digitalWrite</span>(pinTrigger, LOW);  <span class="function">delayMicroseconds</span>(<span class="number">2</span>);
+  <span class="function">digitalWrite</span>(pinTrigger, HIGH); <span class="function">delayMicroseconds</span>(<span class="number">10</span>);
+  <span class="function">digitalWrite</span>(pinTrigger, LOW);
+
+  <span class="comment">// Capturar tiempo de respuesta del eco</span>
+  duracion  = <span class="function">pulseIn</span>(pinEcho, HIGH);
+  distancia = duracion * <span class="number">0.0343</span> / <span class="number">2.0</span>;
+
+  <span class="function">Serial</span>.<span class="function">print</span>(<span class="string">"Distancia: "</span>);
+  <span class="function">Serial</span>.<span class="function">print</span>(distancia, <span class="number">2</span>);  <span class="comment">// 2 decimales</span>
+  <span class="function">Serial</span>.<span class="function">println</span>(<span class="string">" cm"</span>);
+  <span class="function">delay</span>(<span class="number">100</span>);
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="badge-task"><i class="fa-solid fa-star"></i> <strong>Práctica:</strong> Añadir un LED de alerta que encienda cuando la distancia sea menor a 20cm, y un buzzer que suene con mayor frecuencia conforme el objeto se acerque.</div>
+        </div>
+
+        <!-- ═══════════════════ DÍA 10 ═══════════════════ -->
+        <div id="dia10" class="slide-content">
+            <h1 class="main-title">Día 10: Protocolo de Comunicación Serial USB</h1>
+            <p class="subtitle">Establecimiento de un enlace full-duplex de transferencia de bytes entre microcontrolador y PC.</p>
+
+            <div class="concept-card">
+                <h3>API Serial de Arduino + pySerial en Python <span class="tag">Comunicaciones</span></h3>
+                <p>La comunicación serial transmite <strong>bytes secuencialmente</strong> por un canal de datos. Para que Arduino y Python se entiendan, ambos extremos deben configurarse a la misma velocidad de bits por segundo: el <strong>Baudrate</strong> (ej. 9600 baudios = 9600 bits/s).</p>
+
+                <div class="diagram-container">
+                    <div class="diagram-title"><i class="fa-solid fa-arrow-right-arrows-left"></i> Canal Full-Duplex USB</div>
+                    <div class="diagram-flex">
+                        <div class="diagram-box">⚙️ Arduino UART</div>
+                        <div class="diagram-arrow">→ Serial.println() →</div>
+                        <div class="diagram-box yellow">📦 Bytes ASCII</div>
+                        <div class="diagram-arrow">→ serial.readline() →</div>
+                        <div class="diagram-box green">🐍 Python UTF-8</div>
+                    </div>
+                </div>
+
+                <div class="code-wrapper">
+                    <div class="code-header"><div class="lang-badge"><span class="lang-dot python"></span> Python — pySerial receptor</div><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                    <pre><code><span class="keyword">import</span> serial
+<span class="keyword">import</span> time
+
+<span class="comment"># Inicialización: puerto, baudrate, timeout</span>
+arduino = serial.<span class="function">Serial</span>(<span class="string">'COM3'</span>, <span class="number">9600</span>, timeout=<span class="number">1</span>)
+time.<span class="function">sleep</span>(<span class="number">2</span>) <span class="comment"># Espera el auto-reset del hardware Arduino</span>
+
+<span class="function">print</span>(<span class="string">"✅ Conexión establecida con Arduino"</span>)
+
+<span class="keyword">while</span> <span class="keyword">True</span>:
+    <span class="keyword">if</span> arduino.in_waiting > <span class="number">0</span>:
+        datos_crudos = arduino.<span class="function">readline</span>()
+        <span class="comment"># Decodificación obligatoria: bytes → str</span>
+        datos_limpios = datos_crudos.<span class="function">decode</span>(<span class="string">'utf-8'</span>).<span class="function">strip</span>()
+        <span class="function">print</span>(<span class="string">f"📡 Arduino → Python: {datos_limpios}"</span>)</code></pre>
+                </div>
+            </div>
+
+            <div class="badge-task"><i class="fa-solid fa-star"></i> <strong>Práctica:</strong> Extender el script para guardar cada lectura en un archivo <code>log_sensores.txt</code> con timestamp, usando la librería <code>datetime</code> de Python.</div>
+        </div>
+
+        <!-- ═══════════════════ DÍA 11 ═══════════════════ -->
+        <div id="dia11" class="slide-content">
+            <h1 class="main-title">Día 11: Interfaces Orientadas a Comandos</h1>
+            <p class="subtitle">Desarrollo de terminales de software para control remoto bidireccional de actuadores físicos.</p>
+
+            <div class="concept-card">
+                <h3>Intérprete de Comandos Seriales <span class="tag">Arquitectura de Software</span></h3>
+                <p>En lugar de solo recibir telemetría, el computador <strong>codifica caracteres ASCII</strong> y los escribe en el búfer serial. El Arduino los analiza mediante un <code>switch-case</code> y activa/desactiva actuadores físicos en tiempo real.</p>
+
+                <div class="diagram-container">
+                    <div class="diagram-title"><i class="fa-solid fa-terminal"></i> Control Remoto Bidireccional</div>
+                    <div class="diagram-flex">
+                        <div class="diagram-box">🐍 Python → b'E'</div>
+                        <div class="diagram-arrow">Bus USB ➔</div>
+                        <div class="diagram-box yellow">⚙️ Serial.read()</div>
+                        <div class="diagram-arrow">Caso 'E' ➔</div>
+                        <div class="diagram-box green">💡 LED encendido</div>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab(this,'t11-py')">🐍 Python (Maestro)</button>
+                    <button class="tab-btn" onclick="switchTab(this,'t11-cpp')">⚙️ Arduino (Esclavo)</button>
+                </div>
+
+                <div id="t11-py" class="tab-panel active">
+                    <div class="code-wrapper">
+                        <div class="code-header"><div class="lang-badge"><span class="lang-dot python"></span> Python — Terminal de comandos</div><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                        <pre><code><span class="keyword">import</span> serial
+
+arduino = serial.<span class="function">Serial</span>(<span class="string">'COM3'</span>, <span class="number">9600</span>)
+
+<span class="function">print</span>(<span class="string">"Comandos disponibles: E=Encender, A=Apagar, Q=Salir"</span>)
+
+<span class="keyword">while</span> <span class="keyword">True</span>:
+    cmd = <span class="function">input</span>(<span class="string">"Comando → "</span>).strip().upper()
+
+    <span class="keyword">if</span> cmd == <span class="string">"Q"</span>:
+        <span class="keyword">break</span>
+    <span class="keyword">elif</span> cmd <span class="keyword">in</span> [<span class="string">"E"</span>, <span class="string">"A"</span>]:
+        arduino.<span class="function">write</span>(cmd.<span class="function">encode</span>(<span class="string">'utf-8'</span>)) <span class="comment"># str → bytes</span>
+        <span class="function">print</span>(<span class="string">f"✅ Comando '{cmd}' enviado"</span>)
+    <span class="keyword">else</span>:
+        <span class="function">print</span>(<span class="string">"⚠️ Comando no reconocido"</span>)</code></pre>
+                    </div>
+                </div>
+
+                <div id="t11-cpp" class="tab-panel">
+                    <div class="code-wrapper">
+                        <div class="code-header"><div class="lang-badge"><span class="lang-dot arduino"></span> C++ — Receptor de comandos</div><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                        <pre><code><span class="keyword">void</span> <span class="function">setup</span>() {
+  <span class="function">Serial</span>.<span class="function">begin</span>(<span class="number">9600</span>);
+  <span class="function">pinMode</span>(<span class="number">13</span>, OUTPUT);
+}
+
+<span class="keyword">void</span> <span class="function">loop</span>() {
+  <span class="keyword">if</span> (<span class="function">Serial</span>.<span class="function">available</span>() > <span class="number">0</span>) {
+    <span class="type">char</span> cmd = <span class="function">Serial</span>.<span class="function">read</span>(); <span class="comment">// Lee 1 byte</span>
+
+    <span class="keyword">switch</span>(cmd) {
+      <span class="keyword">case</span> <span class="string">'E'</span>:
+        <span class="function">digitalWrite</span>(<span class="number">13</span>, HIGH);
+        <span class="function">Serial</span>.<span class="function">println</span>(<span class="string">"LED encendido"</span>);
+        <span class="keyword">break</span>;
+      <span class="keyword">case</span> <span class="string">'A'</span>:
+        <span class="function">digitalWrite</span>(<span class="number">13</span>, LOW);
+        <span class="function">Serial</span>.<span class="function">println</span>(<span class="string">"LED apagado"</span>);
+        <span class="keyword">break</span>;
+    }
+  }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="badge-task"><i class="fa-solid fa-star"></i> <strong>Práctica:</strong> Ampliar el sistema con comandos 'B' (Buzzer ON), 'S' (Buzzer OFF) y 'D' (leer Distancia del HC-SR04 y enviar a Python).</div>
+        </div>
+
+        <!-- ═══════════════════ DÍA 12 ═══════════════════ -->
+        <div id="dia12" class="slide-content">
+            <h1 class="main-title">Día 12: Sistema Integrado Final de Automatización</h1>
+            <p class="subtitle">Consolidación e instrumentación: proyecto modular unificando todos los módulos de software y hardware.</p>
+
+            <div class="concept-card">
+                <h3>Arquitectura del Lazo de Control Cerrado <span class="tag">Proyecto Final</span></h3>
+                <p>El sistema final unifica todos los módulos estudiados de forma síncrona. El nodo de hardware ejecuta telemetría continua por ultrasonido y la transmite por USB. Python actúa como <strong>cerebro central</strong>: procesa las tramas, evalúa umbrales y dispara comandos de control inverso en tiempo real.</p>
+
+                <div class="diagram-container">
+                    <div class="diagram-title"><i class="fa-solid fa-gears"></i> Lazo de Control Cerrado Completo</div>
+                    <div class="pin-map">
+                        <div class="pin-line"><span>[Subsistema Captura]</span><span>➔ HC-SR04 mide distancia en μs continuamente</span></div>
+                        <div class="pin-line"><span>[Subsistema Enlace]</span><span>➔ Serial.println() empaqueta y transmite por USB</span></div>
+                        <div class="pin-line"><span>[Algoritmo Supervisor]</span><span>➔ Python: ¿distancia &lt; 20cm?</span></div>
+                        <div class="pin-line"><span>[Decisión de Control]</span><span>➔ SI: escribe comando 'A' (ALERTA) en el bus serial</span></div>
+                        <div class="pin-line"><span>[Subsistema Actuación]</span><span>➔ Arduino activa LED rojo + Buzzer 800Hz</span></div>
+                        <div class="pin-line"><span>[Retroalimentación]</span><span>➔ El ciclo continúa cada 100ms</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <h3>Script de Control Maestro en Python <span class="tag">Integración Final</span></h3>
+                <div class="code-wrapper">
+                    <div class="code-header"><div class="lang-badge"><span class="lang-dot python"></span> Python — Sistema de Control Integrado</div><button class="copy-btn" onclick="copyCode(this)">Copiar</button></div>
+                    <pre><code><span class="keyword">import</span> serial, time, datetime
+
+arduino = serial.<span class="function">Serial</span>(<span class="string">'COM3'</span>, <span class="number">9600</span>, timeout=<span class="number">1</span>)
+time.<span class="function">sleep</span>(<span class="number">2</span>)
+
+UMBRAL_ALARMA = <span class="number">20.0</span>  <span class="comment"># cm</span>
+
+<span class="function">print</span>(<span class="string">"🚀 Sistema de automatización activo"</span>)
+
+<span class="keyword">while</span> <span class="keyword">True</span>:
+    <span class="keyword">if</span> arduino.in_waiting > <span class="number">0</span>:
+        trama = arduino.<span class="function">readline</span>().<span class="function">decode</span>(<span class="string">'utf-8'</span>).<span class="function">strip</span>()
+
+        <span class="keyword">try</span>:
+            distancia = <span class="function">float</span>(trama.replace(<span class="string">"Distancia: "</span>, <span class="string">""</span>).replace(<span class="string">" cm"</span>, <span class="string">""</span>))
+            ts = datetime.datetime.<span class="function">now</span>().<span class="function">strftime</span>(<span class="string">"%H:%M:%S"</span>)
+            <span class="function">print</span>(<span class="string">f"[{ts}] 📡 {distancia:.2f} cm"</span>)
+
+            <span class="keyword">if</span> distancia &lt; UMBRAL_ALARMA:
+                arduino.<span class="function">write</span>(<span class="string">b'A'</span>)  <span class="comment"># ¡ALERTA!</span>
+                <span class="function">print</span>(<span class="string">f"  ⚠️  OBJETO A {distancia:.1f}cm — Alarma activada"</span>)
+            <span class="keyword">else</span>:
+                arduino.<span class="function">write</span>(<span class="string">b'N'</span>)  <span class="comment"># Normal</span>
+        <span class="keyword">except</span> ValueError:
+            <span class="keyword">pass</span>  <span class="comment"># Ignora tramas malformadas</span></code></pre>
+                </div>
+            </div>
+
+            <div class="badge-task"><i class="fa-solid fa-star"></i> <strong>Proyecto Final:</strong> Integrar todo en un sistema funcional: sensor HC-SR04 + LED de alerta + buzzer piezoeléctrico controlados desde Python. Guardar todos los eventos en un archivo de log con timestamps para análisis posterior.</div>
+        </div>
+
+    </main>
+
+    <script>
+        const SLIDES = ['intro','comparativa','dia1','dia2','dia3','dia4','dia5','dia6','dia7','dia8','dia9','dia10','dia11','dia12'];
+
+        function showDay(dayId) {
+            document.querySelectorAll('.slide-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+            const el = document.getElementById(dayId);
+            if (el) el.classList.add('active');
+
+            const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick')?.includes(dayId));
+            if (btn) btn.classList.add('active');
+
+            const idx = SLIDES.indexOf(dayId);
+            const pct = idx < 0 ? 0 : Math.round((idx / (SLIDES.length - 1)) * 100);
+            document.getElementById('progressFill').style.width = pct + '%';
+            document.getElementById('progressPct').textContent = pct + '%';
+
+            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function switchTab(btn, panelId) {
+            const tabGroup = btn.closest('.tabs');
+            tabGroup.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const slide = btn.closest('.slide-content');
+            const panels = panelId.replace(/t\d+-/, '');
+            const prefix = panelId.replace(/-[^-]+$/, '-');
+            slide.querySelectorAll('.tab-panel').forEach(p => {
+                if (p.id && p.id.startsWith(prefix)) p.classList.remove('active');
+            });
+            const target = document.getElementById(panelId);
+            if (target) target.classList.add('active');
+        }
+
+        function copyCode(btn) {
+            const pre = btn.closest('.code-wrapper').querySelector('pre');
+            navigator.clipboard.writeText(pre.innerText).then(() => {
+                btn.textContent = '✓ Copiado';
+                setTimeout(() => btn.textContent = 'Copiar', 2000);
+            });
+        }
+
+        // Init
+        showDay('intro');
+    </script>
+</body>
+</html>
